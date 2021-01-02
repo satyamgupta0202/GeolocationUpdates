@@ -107,6 +107,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ActivityCompat.requestPermissions(this,new  String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
             }
         }
+        else{
+            Location placeLocation = new Location(LocationManager.GPS_PROVIDER);
+            placeLocation.setLatitude(MainActivity.location.get(intent.getIntExtra("placenum",0)).latitude);
+            placeLocation.setLatitude(MainActivity.location.get(intent.getIntExtra("placenum",0)).longitude);
+            centerUserLocation(placeLocation, MainActivity.city.get(intent.getIntExtra("placenum",0)));
+        }
        // Toast.makeText(this, Integer.toString(intent.getIntExtra("placenum,",0)),Toast.LENGTH_SHORT).show();
         // Add a marker in Sydney and move the camera
        // LatLng sydney = new LatLng(-34, 151);
@@ -137,5 +143,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             address+=sdf.format(new Date());
         }
         mMap.addMarker(new MarkerOptions().position(latLng).title(address));
+        MainActivity.city.add(address);
+        MainActivity.location.add(latLng);
+        MainActivity.arrayAdapter.notifyDataSetChanged();
+        Toast.makeText(this,"Address Saved",Toast.LENGTH_SHORT).show();
     }
 }
