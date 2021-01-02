@@ -8,6 +8,8 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -21,7 +23,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import java.sql.Time;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback , GoogleMap.OnMapLongClickListener {
 
     private GoogleMap mMap;
     LocationManager locationManager;
@@ -30,7 +38,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng userLocation = new LatLng(location.getLatitude(),location.getLongitude());
         mMap.clear();
         mMap.addMarker(new MarkerOptions().position(userLocation).title(title));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,19));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,12));
     }
 
     @Override
@@ -63,7 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        mMap.setOnMapLongClickListener(this);
         Intent intent = getIntent();
         if(intent.getIntExtra("placenum",0)==0){
             //Zoom the location
@@ -104,5 +112,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
        // LatLng sydney = new LatLng(-34, 151);
        // mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
        // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        String address = "";
+        try{
+            List<Address> addressList = geocoder.getFromLocation(latLng.latitude,latLng.longitude,1);
+            if(addressList!=null && addressList.size()>0){
+                if(addressList.get(0).getThoroughfare()!=null){
+                    address+=addressList.get(0).getThoroughfare();
+                }
+                if(addressList.get(0).getPostalCode()!=null){
+                    address+=addressList.get(0).getPostalCode();
+                }
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        if(address.equals("")) {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH-mm yyyy-MM-dd");
+            address+=sdf.format(new Date());
+        }
+        mMap.addMarker(new MarkerOptions().position(latLng).title(address));
     }
 }
