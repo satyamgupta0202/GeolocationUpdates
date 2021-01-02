@@ -2,6 +2,7 @@ package com.example.geolocationupdates;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Adapter;
@@ -28,7 +29,10 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, city.get(position),Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(),MapsActivity.class);
+                intent.putExtra("placenum",position);
+                startActivity(intent);
+               // Toast.makeText(MainActivity.this, city.get(position),Toast.LENGTH_SHORT).show();
             }
         });
     }
