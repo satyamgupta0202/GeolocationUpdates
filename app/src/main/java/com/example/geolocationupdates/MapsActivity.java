@@ -6,7 +6,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -25,6 +27,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -146,6 +149,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MainActivity.city.add(address);
         MainActivity.location.add(latLng);
         MainActivity.arrayAdapter.notifyDataSetChanged();
+
+        SharedPreferences sharedPreferences = this.getSharedPreferences("com.example.geolocationupdates", Context.MODE_PRIVATE);
+        try {
+            ArrayList<String>lattitude = new ArrayList<>();
+            ArrayList<String>longitude = new ArrayList<>();
+            for(LatLng coor: MainActivity.location){
+                lattitude.add(Double.toString(coor.latitude));
+                longitude.add(Double.toString(coor.longitude));
+
+            }
+            sharedPreferences.edit().putString("city",ObjectSerializer.serialize(MainActivity.city)).apply();
+            sharedPreferences.edit().putString("lat", ObjectSerializer.serialize((lattitude))).apply();
+            sharedPreferences.edit().putString("lon", ObjectSerializer.serialize((longitude))).apply();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
         Toast.makeText(this,"Address Saved",Toast.LENGTH_SHORT).show();
     }
 }
